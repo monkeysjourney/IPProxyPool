@@ -1,16 +1,13 @@
 # coding:utf-8
-'''
-定义规则 urls:url列表
-         type：解析方式,取值 regular(正则表达式),xpath(xpath解析),module(自定义第三方模块解析)
-         patten：可以是正则表达式,可以是xpath语句不过要和上面的相对应
-'''
 import os
 import random
 
-'''
-ip，端口，类型(0高匿名，1透明)，protocol(0 http,1 https),country(国家),area(省市),updatetime(更新时间)
- speed(连接速度)
-'''
+"""
+代理爬取配置
+定义规则 urls:url列表
+         type：解析方式,取值 regular(正则表达式),xpath(xpath解析),module(自定义第三方模块解析)
+         patten：可以是正则表达式,可以是xpath语句不过要和上面的相对应
+"""
 parserList = [
     {
         'urls': ['http://www.66ip.cn/%s.html' % n for n in ['index'] + list(range(2, 12))],
@@ -95,6 +92,7 @@ parserList = [
         'position': {'ip': 0, 'port': 1, 'type': -1, 'protocol': 2}
     }
 ]
+
 '''
 数据库的配置
 '''
@@ -111,6 +109,7 @@ DB_CONFIG = {
 
 }
 
+'''IP地址归属'''
 CHINA_AREA = ['河北', '山东', '辽宁', '黑龙江', '吉林', '甘肃',
               '青海', '河南', '江苏', '湖北', '湖南', '江西',
               '浙江', '广东', '云南', '福建', '台湾', '海南',
@@ -118,8 +117,10 @@ CHINA_AREA = ['河北', '山东', '辽宁', '黑龙江', '吉林', '甘肃',
               '北京', '上海', '天津', '广西', '内蒙', '西藏',
               '新疆', '宁夏', '香港', '澳门']
 QQWRY_PATH = os.path.dirname(__file__) + "/data/qqwry.dat"
-THREADNUM = 5
+
+"""API服务配置"""
 API_PORT = 8000
+
 '''
 爬虫爬取和检测ip的设置条件
 不需要检测ip是否已经存在，因为会定时清理
@@ -128,12 +129,6 @@ UPDATE_TIME = 30 * 60  # 每半个小时检测一次是否有代理ip失效
 MINNUM = 50  # 当有效的ip值小于一个时 需要启动爬虫进行爬取
 
 TIMEOUT = 5  # socket延时
-'''
-反爬虫的设置
-'''
-'''
-重试次数
-'''
 RETRY_TIME = 3
 
 '''
@@ -188,8 +183,10 @@ def get_header():
 
 
 # 默认给抓取的ip分配20分,每次连接失败,减一分,直到分数全部扣完从数据库中删除
-DEFAULT_SCORE = 10
 DEFAULT_SELECT_LIMIT = 10
+
+
+
 
 TEST_URL = 'http://ip.chinaz.com/getip.aspx'
 TEST_IP = 'http://httpbin.org/ip'

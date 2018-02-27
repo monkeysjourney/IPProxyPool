@@ -35,11 +35,13 @@ class Used(tornado.web.RequestHandler):
     def data_received(self, chunk):
         pass
 
-    def get(self):
-        proxy_id = self.get_argument('proxy_id', None)
-        is_succ = self.get_argument('is_succ', None)
-        speed = self.get_argument('speed', None)
-        use_flag = self.get_argument('use_flag', 'default')
+    def post(self):
+        data = json.loads(self.request.body)
+
+        proxy_id = data.get('id', None)
+        is_succ = data.get('is_succ', None)
+        speed = data.get('speed', None)
+        use_flag = data.get('use_flag', 'default')
 
         if proxy_id and is_succ and speed:
             sqlhelper.update(int(proxy_id),
