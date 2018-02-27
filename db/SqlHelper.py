@@ -115,7 +115,7 @@ class SqlHelper:
             res += query.join(ProxyUse, Proxy.id == ProxyUse.proxy_id) \
                 .filter(or_(ProxyUse.use_num < 10,
                             and_(ProxyUse.use_num > 10,
-                                 ProxyUse.succ_num / ProxyUse.use_num > succ_rate
+                                 ProxyUse.succ_num > ProxyUse.use_num * succ_rate
                                  ).self_group())
                         ) \
                 .order_by(ProxyUse.update_at) \
