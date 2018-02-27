@@ -9,11 +9,7 @@ import requests
 
 # own
 from util.log import logger
-from config import get_header
-
-PROXY_SERVER_ADDR = 'localhost'
-PROXY_SERVER_PORT = 8000
-PROXY_GET_ONCE_NUM = 30
+from .config import *
 
 
 class ProxyRequest:
