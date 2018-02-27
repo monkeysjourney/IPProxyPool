@@ -36,7 +36,7 @@ class Used(tornado.web.RequestHandler):
         pass
 
     def post(self):
-        data = json.loads(self.request.body)
+        data = json.loads(str(self.request.body))
 
         proxy_id = data.get('id', None)
         is_succ = data.get('is_succ', None)
