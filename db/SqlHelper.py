@@ -61,8 +61,6 @@ class SqlHelper:
     def delete(self):
         """
         删除
-        :param conditions:
-        :return:
         """
         pass
 
@@ -108,18 +106,22 @@ class SqlHelper:
 
         if res:
             for r in res:
-                print(r)
                 self.session.add(ProxyUse(use_flag=use_flag, proxy_id=r[2], use_num=0, succ_num=0, total_speed=0))
             self.session.commit()
 
         # 2、查询使用次数大于10次 成功几率在50%以上，或者小于10次 最近没有使用过的代理
-        if len(res) < count:
+        succ_rate = 0.5
+        while len(res) < count:
             res += query.join(ProxyUse, Proxy.id == ProxyUse.proxy_id) \
                 .filter(or_(ProxyUse.use_num < 10,
-                            and_(ProxyUse.use_num > 10, ProxyUse.succ_num > ProxyUse.use_num / 2).self_group())) \
+                            and_(ProxyUse.use_num > 10,
+                                 ProxyUse.succ_num / ProxyUse.use_num > succ_rate
+                                 ).self_group())
+                        ) \
                 .order_by(ProxyUse.update_at) \
                 .limit(count - len(res)) \
                 .all()
+            succ_rate -= 0.1
 
         return res
 
