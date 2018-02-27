@@ -1,3 +1,4 @@
+tornado
 chardet==2.3.0
 gevent==1.2.0
 greenlet==0.4.11

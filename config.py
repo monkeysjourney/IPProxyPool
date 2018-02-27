@@ -36,7 +36,6 @@ parserList = [
         'type': 'xpath',
         'pattern': ".//table[@class='list']/tr",
         'position': {'ip': './td[1]', 'port': './td[2]', 'type': '', 'protocol': ''}
-
     },
     {
         'urls': ['https://proxy-list.org/english/index.php?p=%s' % n for n in range(1, 10)],
@@ -103,18 +102,21 @@ DB_CONFIG = {
 
     'DB_CONNECT_TYPE': 'sqlalchemy',  # 'pymongo'sqlalchemy;redis
     # 'DB_CONNECT_STRING':'mongodb://localhost:27017/'
-    'DB_CONNECT_STRING': 'sqlite:///' + os.path.dirname(__file__) + '/data/proxy.db'
+    # 'DB_CONNECT_STRING': 'sqlite:///' + os.path.dirname(__file__) + '/data/proxy.db',
+    'DB_CONNECT_STRING': 'postgresql://postgres:hengshi123@192.168.1.12:5432/IPProxy'
     # DB_CONNECT_STRING : 'mysql+mysqldb://root:root@localhost/proxy?charset=utf8'
 
     # 'DB_CONNECT_TYPE': 'redis',  # 'pymongo'sqlalchemy;redis
     # 'DB_CONNECT_STRING': 'redis://localhost:6379/8',
 
 }
-CHINA_AREA = ['河北', '山东', '辽宁', '黑龙江', '吉林'
-    , '甘肃', '青海', '河南', '江苏', '湖北', '湖南',
-              '江西', '浙江', '广东', '云南', '福建',
-              '台湾', '海南', '山西', '四川', '陕西',
-              '贵州', '安徽', '重庆', '北京', '上海', '天津', '广西', '内蒙', '西藏', '新疆', '宁夏', '香港', '澳门']
+
+CHINA_AREA = ['河北', '山东', '辽宁', '黑龙江', '吉林', '甘肃',
+              '青海', '河南', '江苏', '湖北', '湖南', '江西',
+              '浙江', '广东', '云南', '福建', '台湾', '海南',
+              '山西', '四川', '陕西', '贵州', '安徽', '重庆',
+              '北京', '上海', '天津', '广西', '内蒙', '西藏',
+              '新疆', '宁夏', '香港', '澳门']
 QQWRY_PATH = os.path.dirname(__file__) + "/data/qqwry.dat"
 THREADNUM = 5
 API_PORT = 8000
@@ -183,26 +185,30 @@ def get_header():
         'Connection': 'keep-alive',
         'Accept-Encoding': 'gzip, deflate',
     }
-#默认给抓取的ip分配20分,每次连接失败,减一分,直到分数全部扣完从数据库中删除
-DEFAULT_SCORE=10
+
+
+# 默认给抓取的ip分配20分,每次连接失败,减一分,直到分数全部扣完从数据库中删除
+DEFAULT_SCORE = 10
+DEFAULT_SELECT_LIMIT = 10
 
 TEST_URL = 'http://ip.chinaz.com/getip.aspx'
 TEST_IP = 'http://httpbin.org/ip'
 TEST_HTTP_HEADER = 'http://httpbin.org/get'
 TEST_HTTPS_HEADER = 'https://httpbin.org/get'
-#CHECK_PROXY变量是为了用户自定义检测代理的函数
-#现在使用检测的网址是httpbin.org,但是即使ip通过了验证和检测
-#也只能说明通过此代理ip可以到达httpbin.org,但是不一定能到达用户爬取的网址
-#因此在这个地方用户可以自己添加检测函数,我以百度为访问网址尝试一下
-#大家可以看一下Validator.py文件中的baidu_check函数和detect_proxy函数就会明白
+# CHECK_PROXY变量是为了用户自定义检测代理的函数
+# 现在使用检测的网址是httpbin.org,但是即使ip通过了验证和检测
+# 也只能说明通过此代理ip可以到达httpbin.org,但是不一定能到达用户爬取的网址
+# 因此在这个地方用户可以自己添加检测函数,我以百度为访问网址尝试一下
+# 大家可以看一下Validator.py文件中的baidu_check函数和detect_proxy函数就会明白
 
-CHECK_PROXY={'function':'checkProxy'}#{'function':'baidu_check'}
 
-#下面配置squid,现在还没实现
-#SQUID={'path':None,'confpath':'C:/squid/etc/squid.conf'}
+# 下面配置squid,现在还没实现
+# SQUID={'path':None,'confpath':'C:/squid/etc/squid.conf'}
 
-MAX_CHECK_PROCESS = 2 # CHECK_PROXY最大进程数
-MAX_CHECK_CONCURRENT_PER_PROCESS = 30 # CHECK_PROXY时每个进程的最大并发
-TASK_QUEUE_SIZE = 50 # 任务队列SIZE
-MAX_DOWNLOAD_CONCURRENT = 3 # 从免费代理网站下载时的最大并发 
-CHECK_WATI_TIME = 1#进程数达到上限时的等待时间
+MAX_CHECK_PROCESS = 2  # CHECK_PROXY最大进程数
+MAX_CHECK_CONCURRENT_PER_PROCESS = 30  # CHECK_PROXY时每个进程的最大并发
+TASK_QUEUE_SIZE = 50  # 任务队列SIZE
+MAX_DOWNLOAD_CONCURRENT = 3  # 从免费代理网站下载时的最大并发
+CHECK_WATI_TIME = 1  # 进程数达到上限时的等待时间
+
+log_dir = "./__log"
