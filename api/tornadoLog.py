@@ -11,7 +11,7 @@ from config import log_dir
 logger = logging.getLogger()
 
 
-def init_log(log_file_name="tornado"):
+def init_tornado_log(log_file_name="tornado"):
     """
     初始化log
     :param log_file_name: 文件名

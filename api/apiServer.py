@@ -13,7 +13,7 @@ from tornado.options import define, options
 
 from config import DEFAULT_SELECT_LIMIT, API_PORT
 from db.SqlHelper import SqlHelper as SqlHelper
-from api.tornadoLog import logger, init_log
+from api.tornadoLog import logger, init_tornado_log
 
 sqlhelper = SqlHelper()
 
@@ -60,7 +60,7 @@ def start_api_server():
     :return:
     """
 
-    init_log()
+    init_tornado_log()
 
     # 默认配置
     define("port", default=API_PORT, help="run on the given port", type=int)
