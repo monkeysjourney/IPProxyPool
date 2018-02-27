@@ -43,13 +43,14 @@ class Used(tornado.web.RequestHandler):
         speed = data.get('speed', None)
         use_flag = data.get('use_flag', 'default')
 
-        if proxy_id and is_succ and speed:
+        if proxy_id and is_succ and speed is not None:
             sqlhelper.update(int(proxy_id),
                              True if is_succ.lower().find('f') == -1 else False,
-                             int(speed),
+                             float(speed),
                              use_flag)
             self.write('submit')
         else:
+            logger.error('used post error -- %s' % self.request.body)
             self.write('error')
 
 

@@ -1,6 +1,6 @@
 # coding:utf-8
 import datetime
-from sqlalchemy import Column, create_engine, VARCHAR, Integer, BigInteger, DateTime, or_, and_
+from sqlalchemy import Column, create_engine, VARCHAR, Integer, BigInteger, Float, DateTime, or_, and_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from config import DB_CONFIG, DEFAULT_SELECT_LIMIT
@@ -21,7 +21,7 @@ class Proxy(BaseModel):
     port = Column(Integer, nullable=False)
     country = Column(VARCHAR(100), nullable=False)
     area = Column(VARCHAR(100), nullable=False)
-    insert_at = Column(DateTime(), default=datetime.datetime.utcnow)
+    insert_at = Column(DateTime(), default=datetime.datetime.now)
 
 
 class ProxyUse(BaseModel):
@@ -29,10 +29,10 @@ class ProxyUse(BaseModel):
     id = Column(Integer, primary_key=True, autoincrement=True)
     use_flag = Column(VARCHAR(32), nullable=False, default='default')
     proxy_id = Column(Integer, nullable=False)
-    use_num = Column(Integer, nullable=False, default=0)
-    succ_num = Column(Integer, nullable=False, default=0)
-    total_speed = Column(BigInteger, nullable=False, default=0)
-    update_at = Column(DateTime(), default=datetime.datetime.now())
+    use_num = Column(BigInteger, nullable=False, default=0)
+    succ_num = Column(BigInteger, nullable=False, default=0)
+    total_speed = Column(Float, nullable=False, default=0)
+    update_at = Column(DateTime(), default=datetime.datetime.now)
 
 
 class SqlHelper:
@@ -83,19 +83,12 @@ class SqlHelper:
         else:
             succ_num = 0
 
-        query = self.session.query(ProxyUse.id) \
-            .filter(ProxyUse.proxy_id == proxy_id) \
-            .filter(ProxyUse.use_flag == use_flag)
-
-        # 如果没有记录插入 如果有记录 更新
-        if not query.one_or_none():
-            self.session.add(
-                ProxyUse(use_flag=use_flag, proxy_id=proxy_id, use_num=1, succ_num=succ_num, total_speed=speed))
-        else:
-            query.update({ProxyUse.use_num: ProxyUse.use_num + 1,
-                          ProxyUse.succ_num: ProxyUse.succ_num + succ_num,
-                          ProxyUse.total_speed: ProxyUse.total_speed + speed,
-                          ProxyUse.update_at: datetime.datetime.now()})
+        self.session.query(ProxyUse.id) \
+            .filter(and_(ProxyUse.proxy_id == proxy_id, ProxyUse.use_flag == use_flag)) \
+            .update({ProxyUse.use_num: ProxyUse.use_num + 1,
+                     ProxyUse.succ_num: ProxyUse.succ_num + succ_num,
+                     ProxyUse.total_speed: ProxyUse.total_speed + speed,
+                     ProxyUse.update_at: datetime.datetime.now()})
 
         self.session.commit()
 
@@ -113,6 +106,12 @@ class SqlHelper:
             .limit(count) \
             .all()
 
+        if res:
+            for r in res:
+                print(r)
+                self.session.add(ProxyUse(use_flag=use_flag, proxy_id=r[2], use_num=0, succ_num=0, total_speed=0))
+            self.session.commit()
+
         # 2、查询使用次数大于10次 成功几率在50%以上，或者小于10次 最近没有使用过的代理
         if len(res) < count:
             res += query.join(ProxyUse, Proxy.id == ProxyUse.proxy_id) \
@@ -121,6 +120,7 @@ class SqlHelper:
                 .order_by(ProxyUse.update_at) \
                 .limit(count - len(res)) \
                 .all()
+
         return res
 
     def close(self):
