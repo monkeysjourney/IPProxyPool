@@ -111,8 +111,6 @@ class StatusWeb(tornado.web.RequestHandler):
         self.write(res)
 
 
-
-
 def start_api_server():
     """
     状态web

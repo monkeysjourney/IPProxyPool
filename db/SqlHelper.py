@@ -109,7 +109,7 @@ class SqlHelper:
             res += query.join(ProxyUse, Proxy.id == ProxyUse.proxy_id) \
                 .filter(or_(ProxyUse.use_num < 10,
                             and_(ProxyUse.use_num > 10,
-                                 ProxyUse.succ_num > ProxyUse.use_num * succ_rate
+                                 ProxyUse.succ_num >= ProxyUse.use_num * succ_rate
                                  ).self_group())
                         ) \
                 .order_by(ProxyUse.update_at) \
@@ -134,7 +134,7 @@ class SqlHelper:
             # 查询成功率对应的数量和平均使用数量
             res = self.session.execute('''SELECT cast(cast(succ_num as FLOAT) / use_num AS decimal(18,1)) AS rate,
                                           count(1) AS num, sum(use_num) FROM proxy_use
-                                          WHERE use_flag = '%s' GROUP BY rate ORDER BY rate'''
+                                          WHERE use_flag = '%s' and use_num > 10 GROUP BY rate ORDER BY rate'''
                                        % flag)
 
             data.append({'flag': flag,
