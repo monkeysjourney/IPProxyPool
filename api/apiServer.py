@@ -54,6 +54,65 @@ class Used(tornado.web.RequestHandler):
             self.write('error')
 
 
+class StatusWeb(tornado.web.RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self):
+        res = """<html><head><meta charset="UTF-8"><title>Title</title>
+        <!--meta http-equiv="refresh" content="60"-->
+        <style>
+        /* Border styles */
+        #table-1 thead, #table-1 tr {
+            border-top-width: 1px;
+            border-top-style: solid;
+            border-top-color: rgb(230, 189, 189);
+        }
+        #table-1 {
+            border-bottom-width: 1px;
+            border-bottom-style: solid;
+            border-bottom-color: rgb(230, 189, 189);
+        }
+        /* Padding and font style */
+        #table-1 td, #table-1 th {
+            text-align: center;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-family: Verdana;
+            color: rgb(177, 106, 104);
+        }
+        #table-1 tr {
+            background: #FFF
+        }
+        .types {
+            background: rgb(238, 211, 210)
+        }
+        </style></head>
+        <body><table id="table-1">
+        """
+
+        data = sqlhelper.status()
+
+        for fd in data['flags_data']:
+            res += """<tr><td colspan="%d" class='types'>%s(%d/%d)</td></tr>"""\
+                   % (len(fd['data']) + 1, fd['flag'], fd['total_use'], data['proxy_num'])
+            res += '<tr><th>成功率</th>'
+            for d in fd['data']:
+                res += """<td>%d%%</td>""" % d['succ_rate']
+            res += '</tr><tr><th>代理数量</th>'
+            for d in fd['data']:
+                res += """<td>%d</td>""" % d['num']
+            res += '</tr><tr><th>平均使用次数</th>'
+            for d in fd['data']:
+                res += """<td>%d</td>""" % d['avg_use_num']
+            res += '</tr>'
+
+        res += '</table></body></html>'
+        self.write(res)
+
+
+
+
 def start_api_server():
     """
     状态web
@@ -69,7 +128,8 @@ def start_api_server():
 
     # 路由
     app = tornado.web.Application(handlers=[
-        (r"/", GetProxy),
+        (r"/", StatusWeb),
+        (r"/status", StatusWeb),
         (r"/get", GetProxy),
         (r"/used", Used)
     ])

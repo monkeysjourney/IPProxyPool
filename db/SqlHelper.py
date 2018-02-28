@@ -5,12 +5,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from config import DB_CONFIG, DEFAULT_SELECT_LIMIT
 
-'''
-sql操作的基类
-包括ip，端口，types类型(0高匿名，1透明)，protocol(0 http,1 https http),country(国家),area(省市),updatetime(更新时间)
- speed(连接速度)
-'''
-
 BaseModel = declarative_base()
 
 
@@ -127,6 +121,32 @@ class SqlHelper:
 
     def close(self):
         pass
+
+    def status(self):
+        proxy_num = self.session.query(Proxy).count()
+        use_flags = self.session.query(ProxyUse.use_flag).group_by(ProxyUse.use_flag).all()
+
+        data = []
+
+        for use_flag in use_flags:
+            flag = use_flag[0]
+            flag_proxy_num = self.session.query(ProxyUse).filter(ProxyUse.use_flag == flag).count()
+            # 查询成功率对应的数量和平均使用数量
+            res = self.session.execute('''SELECT cast(cast(succ_num as FLOAT) / use_num AS decimal(18,1)) AS rate,
+                                          count(1) AS num, sum(use_num) FROM proxy_use
+                                          WHERE use_flag = '%s' GROUP BY rate ORDER BY rate'''
+                                       % flag)
+
+            data.append({'flag': flag,
+                         'total_use': flag_proxy_num,
+                         'data': [{'succ_rate': int(r[0] * 100),
+                                   'num': r[1],
+                                   'avg_use_num': int(r[2] / r[1])
+                                   }
+                                  for r in res]
+                         })
+
+        return {'proxy_num': proxy_num, 'flags_data': data}
 
 
 if __name__ == '__main__':
