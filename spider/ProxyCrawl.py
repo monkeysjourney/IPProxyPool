@@ -14,6 +14,7 @@ from db.SqlHelper import SqlHelper as SqlHelper
 
 
 def start_proxy_crawl():
+    init_log('ip_proxy')
     crawl = ProxyCrawl()
     crawl.run()
 
