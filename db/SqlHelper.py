@@ -126,7 +126,7 @@ class SqlHelper:
         proxy_num = self.session.query(Proxy).count()
         use_flags = self.session.query(ProxyUse.use_flag).group_by(ProxyUse.use_flag).all()
 
-        data = []
+        flags_data = []
 
         for use_flag in use_flags:
             flag = use_flag[0]
@@ -137,16 +137,30 @@ class SqlHelper:
                                           WHERE use_flag = '%s' and use_num >= 10 GROUP BY rate ORDER BY rate'''
                                        % flag)
 
-            data.append({'flag': flag,
-                         'total_use': flag_proxy_num,
-                         'data': [{'succ_rate': int(r[0] * 100),
-                                   'num': r[1],
-                                   'avg_use_num': int(r[2] / r[1])
-                                   }
-                                  for r in res]
-                         })
+            data = [{'succ_rate': int(r[0] * 100),
+                     'num': r[1],
+                     'avg_use_num': int(r[2] / r[1])
+                     }
+                    for r in res]
 
-        return {'proxy_num': proxy_num, 'flags_data': data}
+            if not data:
+                res = self.session.execute('''SELECT cast(cast(succ_num as FLOAT) / use_num AS decimal(18,1)) AS rate,
+                                          count(1) AS num, sum(use_num) FROM proxy_use
+                                          WHERE use_flag = '%s' and use_num != 0 GROUP BY rate ORDER BY rate'''
+                                           % flag)
+
+                data = [{'succ_rate': int(r[0] * 100),
+                         'num': r[1],
+                         'avg_use_num': int(r[2] / r[1])
+                         }
+                        for r in res]
+
+            flags_data.append({'flag': flag,
+                               'total_use': flag_proxy_num,
+                               'data': data
+                               })
+
+        return {'proxy_num': proxy_num, 'flags_data': flags_data}
 
 
 if __name__ == '__main__':

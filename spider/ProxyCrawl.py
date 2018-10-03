@@ -1,7 +1,9 @@
 # coding:utf-8
 import time
 import gevent
+import gevent.monkey
 from gevent import monkey
+monkey.patch_all()
 
 from util.log import logger, init_log
 
@@ -9,8 +11,6 @@ from config import parserList, UPDATE_TIME, MAX_DOWNLOAD_CONCURRENT, MAX_CHECK_C
 from spider.HtmlDownloader import Html_Downloader
 from spider.HtmlPraser import Html_Parser
 from db.SqlHelper import SqlHelper as SqlHelper
-
-monkey.patch_all()
 
 
 def start_proxy_crawl():
