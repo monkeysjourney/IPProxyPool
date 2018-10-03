@@ -59,7 +59,7 @@ class StatusWeb(tornado.web.RequestHandler):
         pass
 
     def get(self):
-        res = """<html><head><meta charset="UTF-8"><title>Title</title>
+        res = """<html><head><meta charset="UTF-8"><title>IPProxy Used Status</title>
         <!--meta http-equiv="refresh" content="60"-->
         <style>
         /* Border styles */

@@ -103,7 +103,6 @@ DB_CONFIG = {
     # 'DB_CONNECT_STRING': 'sqlite:///' + os.path.dirname(__file__) + '/data/proxy.db',
     'DB_CONNECT_STRING': 'postgresql://postgres:postgres@db.host:5432/IPProxy'
     # DB_CONNECT_STRING : 'mysql+mysqldb://root:root@localhost/proxy?charset=utf8'
-
     # 'DB_CONNECT_TYPE': 'redis',  # 'pymongo'sqlalchemy;redis
     # 'DB_CONNECT_STRING': 'redis://localhost:6379/8',
 
@@ -125,7 +124,7 @@ API_PORT = 8000
 爬虫爬取和检测ip的设置条件
 不需要检测ip是否已经存在，因为会定时清理
 '''
-UPDATE_TIME = 3600 * 6  # 每半个小时检测一次是否有代理ip失效
+UPDATE_TIME = 3600 * 6  # 每六个小时检测一次是否有代理ip失效
 MINNUM = 50  # 当有效的ip值小于一个时 需要启动爬虫进行爬取
 
 TIMEOUT = 5  # socket延时
